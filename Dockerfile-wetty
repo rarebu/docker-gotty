@@ -1,12 +1,14 @@
 FROM phusion/baseimage
 RUN groupadd -g 999 appuser && useradd -r -u 999 -g appuser appuser
 RUN apt-get update && apt-get -o Dpkg::Options::='--force-confold' --force-yes -fuy dist-upgrade
-RUN apt-get install python2.7 git tmux wget -y
+RUN apt-get install python2.7 git tmux curl wget sudo make build-essential -y
 RUN mkdir /home/appuser/ && chown -R appuser:appuser /home/appuser/
-RUN cd /root && wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz
-RUN tar -zxvf /root/go1.9.2.linux-amd64.tar.gz -C /usr/local/
-RUN export PATH=$PATH:/usr/local/go/bin
-RUN /usr/local/go/bin/go get github.com/yudai/gotty
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt update && apt install -y yarn
+RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+RUN apt-get install -y nodejs
+RUN yarn global add wetty
 #USER appuser
 #RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 #USER root
@@ -14,4 +16,4 @@ RUN /usr/local/go/bin/go get github.com/yudai/gotty
 CMD /bin/sh
 #/root/go/bin/gotty
 #sudo docker run -it -p 8080:8080 test:10
-#CMD /root/go/bin/gotty tmux new -A -s gotty top
+CMD wetty -c /bin/sh
