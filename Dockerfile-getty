@@ -1,17 +1,34 @@
 FROM phusion/baseimage
-RUN groupadd -g 999 appuser && useradd -r -u 999 -g appuser appuser
+RUN useradd -m -p jY0VSieLnllmM -s /bin/bash webuser
 RUN apt-get update && apt-get -o Dpkg::Options::='--force-confold' --force-yes -fuy dist-upgrade
-RUN apt-get install python2.7 git tmux wget -y
-RUN mkdir /home/appuser/ && chown -R appuser:appuser /home/appuser/
+RUN apt-get install python2.7 git tmux nano zsh wget sudo net-tools -y
+RUN adduser webuser sudo
 RUN cd /root && wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz
 RUN tar -zxvf /root/go1.9.2.linux-amd64.tar.gz -C /usr/local/
 RUN export PATH=$PATH:/usr/local/go/bin
 RUN /usr/local/go/bin/go get github.com/yudai/gotty
-#USER appuser
-#RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-#USER root
-#RUN /home/appuser/.linuxbrew/bin/brew install yudai/gotty/gotty
-#CMD /bin/sh
-#/root/go/bin/gotty
-#sudo docker run -it -p 8080:8080 test:10
-CMD /root/go/bin/gotty -w /bin/sh
+RUN echo "# resize not smaller than my client" >> /home/webuser/tmux.conf
+RUN echo "set-window-option -g aggressive-resize on" >> /home/webuser/tmux.conf
+RUN echo "# Created by newuser for 5.1.1" >> /home/webuser/.zshrc
+RUN cp /root/go/bin/gotty /home/webuser/gotty
+RUN chown -R webuser:webuser /home/webuser
+RUN rm /etc/ssh/sshd_config
+RUN echo "Port 22" >> /etc/ssh/sshd_config
+RUN echo "LoginGraceTime 120" >> /etc/ssh/sshd_config
+RUN echo "PermitRootLogin no " >> /etc/ssh/sshd_config
+RUN echo "StrictModes yes" >> /etc/ssh/sshd_config
+RUN echo "PermitEmptyPasswords no" >> /etc/ssh/sshd_config
+RUN echo "Protocol 2" >> /etc/ssh/sshd_config
+RUN echo "UsePrivilegeSeparation yes" >> /etc/ssh/sshd_config
+RUN echo "ClientAliveInterval 120" >> /etc/ssh/sshd_config
+RUN echo "ClientAliveCountMax 720" >> /etc/ssh/sshd_config
+ENTRYPOINT service ssh restart && /bin/zsh
+
+
+
+#user webuser pw webshell123
+#run with sudo docker run -it -p 8080:8080 -p 8022:22 rafthedocker/
+#then log in with ssh: ssh -p 8022 webuser@localhost
+#then run /home/webuser/gotty --width 1024 --height 768 tmux new -A -s gotty zsh &
+#then call localhost:8080 in your webbrowser (otherwise it could happen that tmux wont accept a connection??)
+#then run tmux -> ctrl + b -> s -> choose session
