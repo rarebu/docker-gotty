@@ -27,7 +27,7 @@ ENTRYPOINT service ssh restart && /bin/zsh
 
 
 #user webuser pw webshell123
-#run with sudo docker run -it -p 8080:8080 -p 8022:22 rafthedocker/
+#run with sudo docker run -it -p 8080:8080 -p 8022:22 rafthedocker/getty
 #then log in with ssh: ssh -p 8022 webuser@localhost
 #then run /home/webuser/gotty --width 1024 --height 768 tmux new -A -s gotty zsh &
 #then call localhost:8080 in your webbrowser (otherwise it could happen that tmux wont accept a connection??)
