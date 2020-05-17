@@ -1,10 +1,16 @@
 FROM phusion/baseimage
 RUN useradd -m -p jY0VSieLnllmM -s /bin/bash webuser
 RUN apt-get update && apt-get -o Dpkg::Options::='--force-confold' --force-yes -fuy dist-upgrade
-RUN apt-get install python2.7 git tmux nano zsh wget sudo net-tools -y
+RUN apt-get install python2.7 python man manpages manpages-dev clang gdb valgrind make build-essential fonts-powerline git tmux nano zsh wget curl sudo net-tools -y
+RUN sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN chsh -s /bin/zsh
+RUN cd /root && wget https://github.com/sharkdp/bat/releases/download/v0.15.1/bat_0.15.1_amd64.deb
+RUN dpkg -i /root/bat_0.15.1_amd64.deb
+RUN rm /root/bat_0.15.1_amd64.deb
 RUN adduser webuser sudo
 RUN cd /root && wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz
 RUN tar -zxvf /root/go1.9.2.linux-amd64.tar.gz -C /usr/local/
+RUN rm /root/go1.9.2.linux-amd64.tar.gz
 RUN export PATH=$PATH:/usr/local/go/bin
 RUN /usr/local/go/bin/go get github.com/yudai/gotty
 RUN echo "# resize not smaller than my client" >> /home/webuser/tmux.conf
